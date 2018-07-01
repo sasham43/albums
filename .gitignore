@@ -1,3 +1,5 @@
 .DS_Store
 src/node_modules
 .env
+src/.env
+src/token.txt
