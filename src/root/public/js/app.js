@@ -23,11 +23,21 @@ angular.module('AlbumApp', [])
         }
     }
 })
-.controller('AlbumController', function($scope, UserFactory){
+.factory('AlbumFactory', function($http){
+    return {
+        updateAlbums: (user_id)=>{
+            return $http.get(`/api/albums/update/${user_id}`);
+        }
+    }
+})
+.controller('AlbumController', function($scope, UserFactory, AlbumFactory){
     console.log('loaded');
 
-    UserFactory.getUser().then((data)=>{
-        console.log('user', data);
+    UserFactory.getUser().then((user)=>{
+        console.log('user', user);
+        AlbumFactory.updateAlbums(user.data.id).then((data)=>{
+            console.log('albums', data);
+        })
     }).catch((err)=>{
         console.log('failed to get user', err);
     })

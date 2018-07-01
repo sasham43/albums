@@ -78,7 +78,7 @@ app.get('/auth', function(req, res, next){
 
 app.use('/api', (req, res, next)=>{
     req.spotify = spotify;
-    console.log('spotify', spotify, req.spotify);
+    // console.log('spotify', spotify, req.spotify);
     next();
 });
 
