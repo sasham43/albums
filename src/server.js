@@ -4,6 +4,8 @@ var bodyParser = require('body-parser');
 var config = require('./config').get();
 
 var root = require('./root');
+var albums = require('./albums');
+var users = require('./users');
 var Spotify = require('spotify-web-api-node');
 var fs = require('fs');
 
@@ -61,7 +63,7 @@ app.get('/callback', function(req, res, next){
       fs.writeFile('token.txt', refresh_token)
       // getTracks();
     }, function(err) {
-      console.log('Something went wrong!', err);
+      console.log('Something went wrong callback!', err);
     });
     // get the things
     res.sendFile(__dirname + '/root/public/albums.html');
@@ -74,8 +76,14 @@ app.get('/auth', function(req, res, next){
     res.send(authorizeURL);
 });
 
-// app.use('/api/sentiment',sentiment);
-// app.use('/api/works',works);
+app.use('/api', (req, res, next)=>{
+    req.spotify = spotify;
+    console.log('spotify', spotify, req.spotify);
+    next();
+});
+
+app.use('/api/users',users);
+app.use('/api/albums',albums);
 app.use('/', root);
 
 app.use(function(err, req, res, next){
