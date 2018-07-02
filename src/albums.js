@@ -1,6 +1,7 @@
 const express = require('express');
 var router = express.Router();
 const q = require('q');
+const _ = require('underscore');
 
 router.get('/update/:user_id', (req, res, next)=>{
     // req.spotify.getMySavedAlbums({
@@ -56,9 +57,36 @@ function updateAlbums(spotify, db, user_id) {
             if(same){
                 console.log('same albums');
             } else {
-                console.log('different albums', db_albums);
-                console.log('\n\n');
-                console.log('spotify albums', spotify_albums);
+                // console.log('different albums', db_albums);
+                // console.log('\n\n');
+                // console.log('spotify albums', spotify_albums);
+                console.log('different albums');
+                var new_albums = spotify_albums.filter((sa)=>{
+                    return !_.contains(db_albums, sa);
+                });
+                console.log('new albums', new_albums);
+                new_albums.forEach((album)=>{
+                    spotify.getAlbum(album).then((data)=>{
+                        db.albums.save({
+                            user_id: user_id,
+                            artist: data.body.artists[0].name,
+                            album_name: data.body.name,
+                            href: data.body.href,
+                            uri: data.body.uri,
+                            spotify_album_id: data.body.id
+                        })
+                    })
+                })
+
+                var removed_albums = db_albums.filter((da)=>{
+                    return !_.contains(spotify_albums, da);
+                });
+                console.log('removed albums', removed_albums);
+                removed_albums.forEach((album)=>{
+                    db.albums.destroy({
+                        spotify_album_id: album
+                    });
+                });
             }
         })
     })
