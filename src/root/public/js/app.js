@@ -32,13 +32,21 @@ angular.module('AlbumApp', [])
 })
 .controller('AlbumController', function($scope, UserFactory, AlbumFactory){
     console.log('loaded');
+    $scope.user = {};
 
     UserFactory.getUser().then((user)=>{
         console.log('user', user);
+        $scope.user = user;
         AlbumFactory.updateAlbums(user.data.id).then((data)=>{
             console.log('albums', data);
         })
     }).catch((err)=>{
         console.log('failed to get user', err);
     })
+
+    $scope.addTracks = function(){
+        AlbumFactory.updateAlbums($scope.user.data.id).then((data)=>{
+            console.log('albums', data);
+        })
+    }
 })

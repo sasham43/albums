@@ -4,19 +4,6 @@ const q = require('q');
 const _ = require('underscore');
 
 router.get('/update/:user_id', (req, res, next)=>{
-    // req.spotify.getMySavedAlbums({
-    //     limit : 50,
-    //     offset: 0
-    // })
-    // .then(function(data) {
-    //     // Output items
-    //     console.log('albums', data.body);
-    //     res.send(data.body);
-    // }, function(err) {
-    //     console.log('Something went wrong!', err);
-    //     next(err);
-    // });
-    // saveAlbums(0, req.spotify, req.db, req.params.user_id)
     updateAlbums(req.spotify, req.db, req.params.user_id)
     res.send({
         message: 'started'
@@ -26,6 +13,40 @@ router.get('/update/:user_id', (req, res, next)=>{
 router.get('/', (req, res, next)=>{
 
 });
+
+function updateTracks(spotify, db, user_id) {
+    db.get_albums_with_tracks([user_id]).then((resp)=>{
+        console.log('album tracks', resp);
+        var to_update = resp.filter((a)=>{
+            return a.tracks[0] === null;
+        });
+
+        to_update.forEach((a, i)=>{
+            if(i < 50){
+                spotify.getAlbum(a.spotify_album_id).then((resp)=>{
+                    // console.log('got album', a.id, resp.body.tracks.items);
+                    var tracks = resp.body.tracks.items.map((t)=>{
+
+                        // console.log('typeof', typeof t.uri, typeof a.id, typeof t.name, typeof t.track_number);
+                        return {
+                            uri: t.uri,
+                            album_id: a.id,
+                            name: t.name,
+                            track_number: t.track_number
+                        }
+                    });
+
+                    db.tracks.insert(tracks).then((resp)=>{
+                        console.log('inserted tracks', resp);
+                    }).catch((err)=>{
+                        console.log('failed at inserting tracks', err);
+                    });
+                })
+            }
+
+        })
+    })
+}
 
 function collectAlbumIDs(spotify, offset, albums, cb){
     spotify.getMySavedAlbums({
@@ -57,9 +78,6 @@ function updateAlbums(spotify, db, user_id) {
             if(same){
                 console.log('same albums');
             } else {
-                // console.log('different albums', db_albums);
-                // console.log('\n\n');
-                // console.log('spotify albums', spotify_albums);
                 console.log('different albums');
                 var new_albums = spotify_albums.filter((sa)=>{
                     return !_.contains(db_albums, sa);
@@ -87,7 +105,10 @@ function updateAlbums(spotify, db, user_id) {
                         spotify_album_id: album
                     });
                 });
+
             }
+            updateTracks(spotify, db, user_id);
+
         })
     })
 }
