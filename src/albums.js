@@ -10,6 +10,16 @@ router.get('/update/:user_id', (req, res, next)=>{
     })
 })
 
+router.get('/:user_id', (req, res, next)=>{
+    req.db.vw_album_tracks.find({
+        user_id: req.params.user_id
+    }).then((resp)=>{
+        res.send(resp);
+    }).catch((err)=>{
+        next(err);
+    })
+})
+
 router.get('/', (req, res, next)=>{
 
 });

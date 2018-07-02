@@ -3,11 +3,22 @@
     <head>
         <meta charset="utf-8">
         <title>Albums</title>
+
         <script src="js/components/angular.min.js"></script>
+        <script src="js/components/angular-load.js"></script>
         <script src="js/app.js"></script>
+
     </head>
     <body ng-controller="AlbumController">
         ALBUMS!
         <button ng-click="addTracks()">TRACKS</button>
+        <div class="album-list-container">
+            <div ng-repeat="album in albums" ng-click="play()">
+                {{album.album_name}}
+            </div>
+        </div>
+
+
+        <!-- <script ng-if="token_loaded" src="https://sdk.scdn.co/spotify-player.js"></script> -->
     </body>
 </html>

@@ -9,7 +9,7 @@ var users = require('./users');
 var Spotify = require('spotify-web-api-node');
 var fs = require('fs');
 
-var scopes = ['user-read-private', 'user-read-email', 'user-library-read', 'user-top-read', 'user-read-recently-played', 'user-read-currently-playing', 'user-modify-playback-state', 'user-read-playback-state'],
+var scopes = ['streaming', 'user-read-private', 'user-read-email', 'user-library-read', 'user-top-read', 'user-read-recently-played', 'user-read-currently-playing', 'user-modify-playback-state', 'user-read-playback-state'],
     redirectUri = 'http://localhost:3009/callback',
     clientId = process.env.SPOTIFY_ID,
     clientSecret = process.env.SPOTIFY_SECRET,

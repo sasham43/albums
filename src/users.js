@@ -1,6 +1,12 @@
 const express = require('express');
 var router = express.Router();
 
+router.get('/token', (req, res, next)=>{
+    var token = req.spotify.getAccessToken();
+
+    res.send(token);
+})
+
 router.get('/', (req, res, next)=>{
     req.spotify.getMe()
       .then(function(data) {
