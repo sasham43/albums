@@ -24,6 +24,39 @@ router.get('/', (req, res, next)=>{
 
 });
 
+function updateImages(spotify, db, user_id) {
+    db.get_albums_with_images([user_id]).then(resp=>{
+        var to_update = resp.filter(a=>{
+            return a.images[0] === null;
+        });
+
+        to_update.forEach((a, i)=>{
+            if(i < 50){
+                spotify.getAlbum(a.spotify_album_id).then((resp)=>{
+                    // console.log('got album', a.id, resp.body.tracks.items);
+                    var images = resp.body.images.map(i=>{
+
+                        // console.log('typeof', typeof t.uri, typeof a.id, typeof t.name, typeof t.track_number);
+                        return {
+                            url: i.url,
+                            album_id: a.id,
+                            width: i.width,
+                            height: i.height
+                        }
+                    });
+
+                    db.images.insert(images).then(resp=>{
+                        console.log('inserted images', resp);
+                    }).catch((err)=>{
+                        console.log('failed at inserting images', err);
+                    });
+                })
+            }
+
+        })
+    })
+}
+
 function updateTracks(spotify, db, user_id) {
     db.get_albums_with_tracks([user_id]).then((resp)=>{
         console.log('album tracks', resp);
@@ -117,7 +150,8 @@ function updateAlbums(spotify, db, user_id) {
                 });
 
             }
-            updateTracks(spotify, db, user_id);
+            // updateTracks(spotify, db, user_id);
+            // updateImages(spotify, db, user_id);
 
         })
     })
