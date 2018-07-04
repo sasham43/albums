@@ -66,6 +66,7 @@ angular.module('AlbumApp', ['angularLoad'])
             console.log('got albums', data);
             $scope.albums = data.data.map(a=>{
                 a.images = orderByFilter(a.images, 'width', true)
+                a.tracks = orderByFilter(a.tracks, 'track_number')
                 return a;
             });
         });
@@ -99,10 +100,24 @@ angular.module('AlbumApp', ['angularLoad'])
     };
 
     $scope.setAlbum = function(){
-        if($scope.selected_album.tracks[0].uri == $scope.current_uri && !$scope.paused){
+        if(!$scope.paused && !$scope.current_uri){
+            // nothing playing, start playback
+            PlayerFactory.setTrack({
+                track: $scope.selected_album.tracks[0].uri,
+                device_id: $scope.device_id
+            }).then(resp=>{
+                console.log('set album', resp);
+            }).catch(err=>{
+                console.log('err', err);
+            });
+        } else if($scope.selected_album.tracks[0].uri == $scope.current_uri && !$scope.paused){
             // same track, pause it
             $scope.player.pause().then(resp=>{
                 console.log('pause', resp);
+            })
+        } else if ($scope.paused && $scope.selected_album.tracks[0].uri == $scope.current_uri){
+            $scope.player.resume().then(resp=>{
+                console.log('resumed', resp);
             })
         } else {
             // different track, play it
