@@ -1,6 +1,15 @@
-.album-list-container {
-    /* display: grid; */
+body {
+    background-color: #222;
+    color: aliceblue;
+}
 
+.album-list-container {
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-columns: repeat(3, 400px);
+    grid-row-gap: 20px;
+    padding-top: 15px;
+    justify-content: center;
 }
 
 .list-album-container {
@@ -15,10 +24,20 @@
         "list-image"
         "list-name"
         "list-artist"
+    ;
+    padding: 15px;
+}
+
+.list-album:hover {
+    box-shadow:
+        0 0 0 3px aliceblue,
+        0 0 0 6px #222,
+        0 0 0 9px aliceblue
 }
 
 .list-image-container {
     grid-area: list-image;
+    justify-self: center;
 }
 .list-image {
     width: 300px;
