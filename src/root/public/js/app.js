@@ -36,9 +36,10 @@ angular.module('AlbumApp', ['angularLoad'])
         }
     }
 })
-.controller('AlbumController', function($scope, UserFactory, AlbumFactory, angularLoad){
+.controller('AlbumController', function($scope, orderByFilter, UserFactory, AlbumFactory, angularLoad){
     console.log('loaded');
     $scope.user = {};
+    $scope.show_album_list = true;
 
     UserFactory.getUser().then((user)=>{
         console.log('user', user);
@@ -49,7 +50,10 @@ angular.module('AlbumApp', ['angularLoad'])
 
         AlbumFactory.getAlbums(user.data.id).then((data)=>{
             console.log('got albums', data);
-            $scope.albums = data.data;
+            $scope.albums = data.data.map(a=>{
+                a.images = orderByFilter(a.images, 'width', true)
+                return a;
+            });
         });
     }).catch((err)=>{
         console.log('failed to get user', err);

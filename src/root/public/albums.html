@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <title>Albums</title>
+        <link href="css/list.css" rel="stylesheet" />
 
         <script src="js/components/angular.min.js"></script>
         <script src="js/components/angular-load.js"></script>
@@ -12,10 +13,24 @@
     <body ng-controller="AlbumController">
         ALBUMS!
         <button ng-click="addTracks()">TRACKS</button>
-        <div class="album-list-container">
-            <div ng-repeat="album in albums" ng-click="play()">
-                {{album.album_name}}
+        <div ng-show="show_album_list" class="album-list-container">
+            <div ng-repeat="album in albums" ng-click="play()" class="list-album-container">
+                <div class="list-album">
+                    <div class="list-image-container">
+                        <img class="list-image" ng-src="{{album.images[0].url}}" />
+                    </div>
+                    <div class="list-name-container">
+                        {{album.album_name}}
+                    </div>
+                    <div class="list-artist-container">
+                        {{album.artist}}
+                    </div>
+                </div>
             </div>
+        </div>
+
+        <div ng-show="show_selected_album">
+
         </div>
 
 
