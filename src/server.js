@@ -6,6 +6,7 @@ var config = require('./config').get();
 var root = require('./root');
 var albums = require('./albums');
 var users = require('./users');
+var player = require('./player');
 var Spotify = require('spotify-web-api-node');
 var fs = require('fs');
 
@@ -84,6 +85,7 @@ app.use('/api', (req, res, next)=>{
 
 app.use('/api/users',users);
 app.use('/api/albums',albums);
+app.use('/api/player',player);
 app.use('/', root);
 
 app.use(function(err, req, res, next){
