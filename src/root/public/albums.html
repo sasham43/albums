@@ -30,19 +30,7 @@
         </div>
 
         <div ng-show="show_selected_album" class="selected-album-image-container">
-            <div class="selected-album-controls">
-                <button ng-click="back()" class="button back-button">back</button>
-                <button ng-click="play()" class="button play-button">play</button>
-            </div>
-            <div class="selected-album-image" ng-click="setAlbum()">
-                <img ng-src="{{selected_album.images[0].url}}" />
-            </div>
-            <div class="selected-album-name">
-                {{selected_album.album_name}}
-            </div>
-            <div class="selected-album-artist">
-                {{selected_album.artist}}
-            </div>
+            <selected-album album="selected_album" player="player" options="player_options"></selected-album>
         </div>
 
 

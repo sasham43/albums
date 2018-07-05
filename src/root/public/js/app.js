@@ -54,6 +54,7 @@ angular.module('AlbumApp', ['angularLoad'])
     $scope.user = {};
     $scope.player_initialized = false;
     $scope.show_album_list = true;
+    $scope.player_options = {};
 
     UserFactory.getUser().then((user)=>{
         console.log('user', user);
@@ -82,63 +83,26 @@ angular.module('AlbumApp', ['angularLoad'])
 
     $scope.selectAlbum = function(album){
         $scope.initPlayer().then(function(){
+            console.log('selected album', album);
             $scope.selected_album = album;
             $scope.show_selected_album = true;
             $scope.show_album_list = false;
         })
     };
 
-    $scope.back = function(){
+    // $scope.back = function(){
+    //     $scope.show_selected_album = false;
+    //     $scope.show_album_list = true;
+    // };
+    $scope.$on('back', ()=>{
         $scope.show_selected_album = false;
         $scope.show_album_list = true;
-    };
+    });
 
     $scope.play = function(){
         $scope.player.togglePlay().then(() => {
           console.log('Toggled playback!');
         });
-    };
-
-    $scope.setAlbum = function(){
-        if(!$scope.paused && !$scope.current_uri){
-            // nothing playing, start playback
-            PlayerFactory.setTrack({
-                track: $scope.selected_album.tracks[0].uri,
-                device_id: $scope.device_id
-            }).then(resp=>{
-                console.log('set album', resp);
-            }).catch(err=>{
-                console.log('err', err);
-            });
-        } else if($scope.selected_album.tracks[0].uri == $scope.current_uri && !$scope.paused){
-            // same track, pause it
-            $scope.player.pause().then(resp=>{
-                console.log('pause', resp);
-            })
-        } else if ($scope.paused && $scope.selected_album.tracks[0].uri == $scope.current_uri){
-            $scope.player.resume().then(resp=>{
-                console.log('resumed', resp);
-            })
-        } else {
-            // different track, play it
-            PlayerFactory.setTrack({
-                track: $scope.selected_album.tracks[0].uri,
-                device_id: $scope.device_id
-            }).then(resp=>{
-                console.log('set album', resp);
-            }).catch(err=>{
-                console.log('err', err);
-            })
-        }
-
-        // PlayerFactory.setAlbum($scope.selected_album.uri).then(resp=>{
-        //     console.log('set album', resp);
-        //     player.togglePlay().then(() => {
-        //       console.log('Toggled playback!');
-        //     });
-        // }).catch(err=>{
-        //     console.log('err', err);
-        // })
     };
 
     // init
@@ -165,15 +129,16 @@ angular.module('AlbumApp', ['angularLoad'])
                   $scope.player.addListener('player_state_changed', state => {
                       console.log(state);
                       console.log(`current track: ${state.track_window.current_track.uri}`);
-                      $scope.current_uri = state.track_window.current_track.uri;
-                      $scope.paused = state.paused;
+                      $scope.player_options.current_uri = state.track_window.current_track.uri;
+                      $scope.player_options.paused = state.paused;
                   });
 
                   // Ready
                   $scope.player.addListener('ready', ({ device_id }) => {
                     console.log('Ready with Device ID', device_id);
-                    $scope.device_id = device_id;
+                    // $scope.device_id = device_id;
                     $scope.player_initialized = true;
+                    $scope.player_options.device_id = device_id;
                     d.resolve();
                   });
 
@@ -205,4 +170,57 @@ angular.module('AlbumApp', ['angularLoad'])
 
         return d.promise;
     };
+})
+.directive('selectedAlbum', function(){
+    return {
+        restrict: 'AE',
+        scope: {
+            album: '=',
+            player: '=',
+            options: '='
+        },
+        controller: function($scope, PlayerFactory){
+            $scope.current_track = 0;
+
+            $scope.back = function(){
+                // $scope.show_selected_album = false;
+                // $scope.show_album_list = true;
+                $scope.$emit('back')
+            };
+
+            $scope.setAlbum = function(){
+                if(!$scope.options.paused && !$scope.options.current_uri){
+                    // nothing playing, start playback
+                    PlayerFactory.setTrack({
+                        track: $scope.album.tracks[$scope.current_track].uri,
+                        device_id: $scope.options.device_id
+                    }).then(resp=>{
+                        console.log('set album', resp);
+                    }).catch(err=>{
+                        console.log('err', err);
+                    });
+                } else if($scope.album.tracks[$scope.current_track].uri == $scope.options.current_uri && !$scope.options.paused){
+                    // same track, pause it
+                    $scope.player.pause().then(resp=>{
+                        console.log('pause', resp);
+                    })
+                } else if ($scope.options.paused && $scope.album.tracks[$scope.current_track].uri == $scope.options.current_uri){
+                    $scope.player.resume().then(resp=>{
+                        console.log('resumed', resp);
+                    })
+                } else {
+                    // different track, play it
+                    PlayerFactory.setTrack({
+                        track: $scope.album.tracks[0].uri,
+                        device_id: $scope.options.device_id
+                    }).then(resp=>{
+                        console.log('set album', resp);
+                    }).catch(err=>{
+                        console.log('err', err);
+                    })
+                }
+            };
+        },
+        templateUrl: 'partials/selected-album.html'
+    }
 })

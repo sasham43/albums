@@ -1,0 +1,13 @@
+<div class="selected-album-controls">
+    <button ng-click="back()" class="button back-button">back</button>
+    <button ng-click="play()" class="button play-button">play</button>
+</div>
+<div class="selected-album-image" ng-click="setAlbum()">
+    <img ng-src="{{album.images[0].url}}" />
+</div>
+<div class="selected-album-name">
+    {{album.album_name}}
+</div>
+<div class="selected-album-artist">
+    {{album.artist}}
+</div>
